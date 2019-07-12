@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const request = require('request');
 
 //Express init
 const app = express();
@@ -94,6 +95,25 @@ app.delete('/user/:id', (req, resp) => {
 //Get Users
 app.get('/users', (req, resp) => {
     resp.status(200).send({users});
+});
+
+//Llamando a swapi
+app.get('/api/swapi/:people', (req, res) => {
+    const {people} = req.params;
+    request.get(`https://swapi.co/api/people/${people}`, (error, resp, body) => {
+        const swapiResp = JSON.parse(body);
+        res.status(200).send({message: 'OK', swapiResp});
+    })
+})
+
+//Código 404
+app.use((req, resp, next) => {
+    const response = {
+        error: true,
+        code: 404,
+        mensaje: 'Not found'
+    };
+    resp.status(404).send(response);
 });
 
 app.listen(3000, () => {
